@@ -334,6 +334,24 @@
         }
       }
 
+      function normalizeSiteValues(rawSites) {
+        return (rawSites || [])
+          .map((entry) => {
+            if (entry === null || entry === undefined) return "";
+            if (typeof entry === "string" || typeof entry === "number") {
+              return String(entry || "").trim();
+            }
+            return String(
+              (entry.siteKey !== undefined ? entry.siteKey : "")
+              || (entry.site !== undefined ? entry.site : "")
+              || (entry.value !== undefined ? entry.value : "")
+              || (entry.label !== undefined ? entry.label : "")
+              || ""
+            ).trim();
+          })
+          .filter((siteKey) => siteKey !== "");
+      }
+
       function currentMode() {
         const bootMode = (boot && boot.mode) ? String(boot.mode || "").trim() : "";
         if (bootMode && MODES[bootMode]) return bootMode;
@@ -467,9 +485,19 @@
             $("title").textContent = boot.title || "Formulaire natif";
             $("description").textContent = boot.description || "";
             $("userLine").textContent = boot.userEmail ? ("Compte: " + boot.userEmail) : "";
-            const sites = (boot.sites || []).map((entry) => entry.siteKey || "");
+            const sites = normalizeSiteValues(boot.sites);
             fillSelect("siteKey", sites, false);
-            if (boot.defaultSiteKey) $("siteKey").value = boot.defaultSiteKey;
+            const preferredSite = String(boot.defaultSiteKey || "").trim();
+            if (preferredSite && sites.indexOf(preferredSite) >= 0) {
+              $("siteKey").value = preferredSite;
+            }
+            if (!$("siteKey").value && sites.length) {
+              $("siteKey").value = sites[0];
+            }
+            if (!$("siteKey").value) {
+              setStatus("Aucun site disponible pour ce formulaire.", false);
+              return;
+            }
             applyMode();
             applyAutoItemId(boot.nextItemId);
             loadChoices();
