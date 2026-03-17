@@ -335,7 +335,10 @@
       }
 
       function normalizeSiteValues(rawSites) {
-        return (rawSites || [])
+        const list = Array.isArray(rawSites)
+          ? rawSites
+          : (rawSites === null || rawSites === undefined ? [] : [rawSites]);
+        return list
           .map((entry) => {
             if (entry === null || entry === undefined) return "";
             if (typeof entry === "string" || typeof entry === "number") {
@@ -457,6 +460,19 @@
         const siteKey = $("siteKey").value;
         google.script.run
           .withSuccessHandler((result) => {
+            const resolvedSiteKey = String((result && result.siteKey) || "").trim();
+            if (resolvedSiteKey) {
+              const siteSelect = $("siteKey");
+              const existingSiteValues = Array.from(siteSelect.options || [])
+                .map((opt) => String(opt.value || "").trim())
+                .filter((value) => value !== "");
+              if (existingSiteValues.indexOf(resolvedSiteKey) < 0) {
+                fillSelect("siteKey", [resolvedSiteKey].concat(existingSiteValues), false);
+              }
+              if (!siteSelect.value) {
+                siteSelect.value = resolvedSiteKey;
+              }
+            }
             const itemChoices = (result && result.itemChoices) || [];
             const replenishmentChoices = (result && result.replenishmentChoices) || [];
             const deleteChoices = (result && result.deleteChoices) || [];
@@ -478,29 +494,32 @@
         applyMode();
         google.script.run
           .withSuccessHandler((result) => {
-            boot = result || {};
-            if (!boot.mode) {
-              boot.mode = MODE_BY_FORM_TYPE[String(FORM_TYPE || "").trim().toLowerCase()] || "movement";
+            try {
+              boot = result || {};
+              if (!boot.mode) {
+                boot.mode = MODE_BY_FORM_TYPE[String(FORM_TYPE || "").trim().toLowerCase()] || "movement";
+              }
+              $("title").textContent = boot.title || "Formulaire natif";
+              $("description").textContent = boot.description || "";
+              $("userLine").textContent = boot.userEmail ? ("Compte: " + boot.userEmail) : "";
+              const sites = normalizeSiteValues(boot.sites);
+              fillSelect("siteKey", sites, false);
+              const preferredSite = String(boot.defaultSiteKey || "").trim();
+              if (preferredSite && sites.indexOf(preferredSite) >= 0) {
+                $("siteKey").value = preferredSite;
+              }
+              if (!$("siteKey").value && sites.length) {
+                $("siteKey").value = sites[0];
+              }
+              if (!$("siteKey").value && !sites.length) {
+                setStatus("Bootstrap sans site: tentative de recuperation automatique...", false);
+              }
+              applyMode();
+              applyAutoItemId(boot.nextItemId);
+              loadChoices();
+            } catch (error) {
+              setStatus(String(error && error.message ? error.message : error), false);
             }
-            $("title").textContent = boot.title || "Formulaire natif";
-            $("description").textContent = boot.description || "";
-            $("userLine").textContent = boot.userEmail ? ("Compte: " + boot.userEmail) : "";
-            const sites = normalizeSiteValues(boot.sites);
-            fillSelect("siteKey", sites, false);
-            const preferredSite = String(boot.defaultSiteKey || "").trim();
-            if (preferredSite && sites.indexOf(preferredSite) >= 0) {
-              $("siteKey").value = preferredSite;
-            }
-            if (!$("siteKey").value && sites.length) {
-              $("siteKey").value = sites[0];
-            }
-            if (!$("siteKey").value) {
-              setStatus("Aucun site disponible pour ce formulaire.", false);
-              return;
-            }
-            applyMode();
-            applyAutoItemId(boot.nextItemId);
-            loadChoices();
           })
           .withFailureHandler((error) => {
             setStatus(String(error && error.message ? error.message : error), false);
