@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <style>
+      body {
+        margin: 0;
+        font-family: "Trebuchet MS", Arial, sans-serif;
+        background: #081827;
+        color: #eaf2ff;
+      }
+      .wrap {
+        padding: 16px;
+      }
+      .card {
+        background: #0d2b46;
+        border: 1px solid #2a5d8f;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+      h1 {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+      }
+      p {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .field.full {
+        grid-column: 1 / -1;
+      }
+      label {
+        font-size: 12px;
+        font-weight: 700;
+      }
+      input, select, textarea {
+        border: 1px solid #3a6f9f;
+        background: #0a2238;
+        color: #eaf2ff;
+        border-radius: 6px;
+        padding: 8px;
+        font-size: 12px;
+      }
+      select[multiple] {
+        min-height: 96px;
+      }
+      textarea {
+        min-height: 80px;
+        resize: vertical;
+      }
+      .help {
+        color: #9fc3e8;
+        font-size: 11px;
+      }
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      button {
+        border: none;
+        border-radius: 6px;
+        padding: 9px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      #cancelBtn {
+        background: #35516b;
+        color: #ffffff;
+      }
+      #submitBtn {
+        background: #1f7fcc;
+        color: #ffffff;
+      }
+      #statusBox {
+        display: none;
+        padding: 8px;
+        border-radius: 6px;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+      #statusBox.ok {
+        display: block;
+        background: #114a2f;
+        border: 1px solid #2f8f5c;
+      }
+      #statusBox.error {
+        display: block;
+        background: #4b1c1c;
+        border: 1px solid #9a3a3a;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .muted {
+        color: #b3c8dd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1 id="title">Formulaire natif</h1>
+        <p id="description"></p>
+        <p class="muted" id="userLine"></p>
+      </div>
+
+      <form id="nativeForm" class="card">
+        <div class="grid">
+          <div class="field">
+            <label for="siteKey">Site</label>
+            <select id="siteKey" required></select>
+          </div>
+
+          <div class="field" id="fieldItemValue">
+            <label for="itemValue">Article concerne</label>
+            <select id="itemValue"></select>
+          </div>
+
+          <div class="field hidden" id="fieldDeleteItems">
+            <label for="deleteItems">Supprimer des articles (optionnel)</label>
+            <select id="deleteItems" multiple></select>
+            <span class="help">Selection multiple possible.</span>
+          </div>
+
+          <div class="field hidden" id="fieldItemId">
+            <label for="itemId">ItemID</label>
+            <input id="itemId" type="text" placeholder="INC-0100 / PHA-0100">
+          </div>
+
+          <div class="field hidden" id="fieldItemName">
+            <label for="itemName">Nom article</label>
+            <input id="itemName" type="text" placeholder="Nom lisible">
+          </div>
+
+          <div class="field hidden" id="fieldMovementType">
+            <label for="movementType">Type de mouvement</label>
+            <select id="movementType">
+              <option value="IN">IN</option>
+              <option value="OUT">OUT</option>
+              <option value="CORRECTION">CORRECTION</option>
+              <option value="DELETE_ITEM">DELETE_ITEM</option>
+            </select>
+          </div>
+
+          <div class="field" id="fieldQuantity">
+            <label for="quantity">Quantite</label>
+            <input id="quantity" type="number" step="0.01" value="0">
+          </div>
+
+          <div class="field hidden" id="fieldUnitCost">
+            <label for="unitCost">Cout unitaire</label>
+            <input id="unitCost" type="number" step="0.01" value="0">
+          </div>
+
+          <div class="field hidden" id="fieldPriority">
+            <label for="priority">Priorite</label>
+            <select id="priority">
+              <option value="HIGH">HIGH</option>
+              <option value="MEDIUM" selected>MEDIUM</option>
+              <option value="LOW">LOW</option>
+            </select>
+          </div>
+
+          <div class="field full" id="fieldReason">
+            <label for="reason">Motif</label>
+            <input id="reason" type="text">
+          </div>
+
+          <div class="field hidden" id="fieldOperatorEmail">
+            <label for="operatorEmail">Email operateur</label>
+            <input id="operatorEmail" type="email" placeholder="Laisser vide pour auto-remplissage">
+          </div>
+
+          <div class="field hidden" id="fieldRequesterEmail">
+            <label for="requesterEmail">Email demandeur</label>
+            <input id="requesterEmail" type="email" placeholder="Laisser vide pour auto-remplissage">
+          </div>
+
+          <div class="field hidden" id="fieldCounterEmail">
+            <label for="counterEmail">Email controleur</label>
+            <input id="counterEmail" type="email" placeholder="Laisser vide pour auto-remplissage">
+          </div>
+
+          <div class="field hidden" id="fieldCategory">
+            <label for="category">Categorie article (optionnel)</label>
+            <input id="category" type="text">
+          </div>
+
+          <div class="field hidden" id="fieldUnit">
+            <label for="unit">Unite article (optionnel)</label>
+            <input id="unit" type="text">
+          </div>
+
+          <div class="field hidden" id="fieldMinThreshold">
+            <label for="minThreshold">Seuil mini article (optionnel)</label>
+            <input id="minThreshold" type="number" step="0.01" value="0">
+          </div>
+
+          <div class="field hidden" id="fieldLotNumber">
+            <label for="lotNumber">Numero de lot</label>
+            <input id="lotNumber" type="text">
+          </div>
+
+          <div class="field hidden" id="fieldExpiryDate">
+            <label for="expiryDate">Date de peremption</label>
+            <input id="expiryDate" type="text" placeholder="dd/mm/yyyy">
+          </div>
+
+          <div class="field hidden" id="fieldDocumentRef">
+            <label for="documentRef">Reference document</label>
+            <input id="documentRef" type="text">
+          </div>
+
+          <div class="field full" id="fieldComment">
+            <label for="comment">Commentaire</label>
+            <textarea id="comment"></textarea>
+          </div>
+        </div>
+
+        <div id="statusBox"></div>
+        <div class="actions">
+          <button type="button" id="cancelBtn">Fermer</button>
+          <button type="submit" id="submitBtn">Valider</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      const FORM_TYPE = "<?= formType ?>";
+      const MODULE = "<?= module ?>";
+      let boot = null;
+
+      const MODE_BY_FORM_TYPE = {
+        fire_movement: "movement",
+        fire_inventory: "replenishment",
+        fire_replenishment: "replenishment",
+        fire_item_create: "item_create",
+        pharma_movement: "movement",
+        pharma_inventory: "inventory",
+        pharma_item_create: "item_create"
+      };
+
+      const MODES = {
+        movement: {
+          show: ["fieldItemValue", "fieldDeleteItems", "fieldMovementType", "fieldQuantity", "fieldUnitCost", "fieldReason", "fieldOperatorEmail", "fieldCategory", "fieldUnit", "fieldMinThreshold", "fieldDocumentRef", "fieldComment"],
+          require: ["itemValue", "quantity", "reason"]
+        },
+        replenishment: {
+          show: ["fieldItemValue", "fieldQuantity", "fieldPriority", "fieldReason", "fieldRequesterEmail", "fieldComment"],
+          require: ["itemValue", "quantity", "reason", "priority"]
+        },
+        inventory: {
+          show: ["fieldItemValue", "fieldDeleteItems", "fieldQuantity", "fieldCounterEmail", "fieldCategory", "fieldUnit", "fieldMinThreshold", "fieldComment"],
+          require: ["itemValue", "quantity"]
+        },
+        item_create: {
+          show: ["fieldItemId", "fieldItemName", "fieldQuantity", "fieldReason", "fieldOperatorEmail", "fieldCategory", "fieldUnit", "fieldMinThreshold", "fieldDocumentRef", "fieldComment"],
+          require: ["itemName", "quantity", "reason"]
+        }
+      };
+
+      function $(id) {
+        return document.getElementById(id);
+      }
+
+      function setStatus(message, ok) {
+        const box = $("statusBox");
+        box.textContent = message || "";
+        box.className = ok ? "ok" : "error";
+      }
+
+      function clearStatus() {
+        const box = $("statusBox");
+        box.textContent = "";
+        box.className = "";
+      }
+
+      function setRequired(inputIds, requiredIds) {
+        inputIds.forEach((id) => {
+          const el = $(id);
+          if (!el) return;
+          el.required = requiredIds.indexOf(id) >= 0;
+        });
+      }
+
+      function setFieldVisible(fieldId, visible) {
+        const el = $(fieldId);
+        if (!el) return;
+        if (visible) el.classList.remove("hidden");
+        else el.classList.add("hidden");
+      }
+
+      function fillSelect(selectId, values, includeEmpty) {
+        const select = $(selectId);
+        if (!select) return;
+        const selected = select.multiple
+          ? Array.from(select.selectedOptions || []).map((opt) => opt.value)
+          : select.value;
+        select.innerHTML = "";
+        if (includeEmpty) {
+          const blank = document.createElement("option");
+          blank.value = "";
+          blank.textContent = "--";
+          select.appendChild(blank);
+        }
+        (values || []).forEach((value) => {
+          const opt = document.createElement("option");
+          opt.value = value;
+          opt.textContent = value;
+          select.appendChild(opt);
+        });
+        if (select.multiple) {
+          Array.from(select.options).forEach((opt) => {
+            if (selected.indexOf(opt.value) >= 0) opt.selected = true;
+          });
+        } else if (selected) {
+          select.value = selected;
+        }
+      }
+
+      function currentMode() {
+        const bootMode = (boot && boot.mode) ? String(boot.mode || "").trim() : "";
+        if (bootMode && MODES[bootMode]) return bootMode;
+        const mapped = MODE_BY_FORM_TYPE[String(FORM_TYPE || "").trim().toLowerCase()];
+        return MODES[mapped] ? mapped : "movement";
+      }
+
+      function setFieldLabel(inputId, text) {
+        const label = document.querySelector('label[for="' + inputId + '"]');
+        if (!label) return;
+        label.textContent = text;
+      }
+
+      function applySemanticLabels(mode) {
+        if (mode === "item_create") {
+          setFieldLabel("itemId", "ItemID (auto)");
+          setFieldLabel("quantity", "Quantite initiale");
+          setFieldLabel("reason", "Motif de creation");
+          return;
+        }
+        if (mode === "replenishment") {
+          setFieldLabel("quantity", "Quantite demandee");
+          setFieldLabel("reason", "Motif de la demande");
+          return;
+        }
+        if (mode === "inventory") {
+          setFieldLabel("quantity", "Quantite comptee");
+          setFieldLabel("reason", "Motif");
+          return;
+        }
+        setFieldLabel("quantity", "Quantite");
+        setFieldLabel("reason", "Motif");
+      }
+
+      function applyAutoItemId(nextItemId) {
+        if (currentMode() !== "item_create") return;
+        const itemIdInput = $("itemId");
+        if (!itemIdInput) return;
+        itemIdInput.readOnly = true;
+        itemIdInput.placeholder = "Genere automatiquement";
+        if (nextItemId) {
+          itemIdInput.value = String(nextItemId || "").trim();
+        }
+      }
+
+      function canUseDestructiveActions() {
+        return !!(boot && (boot.canUseDestructiveActions || boot.canDeleteItems));
+      }
+
+      function configureMovementTypeChoices() {
+        const select = $("movementType");
+        if (!select) return;
+        const canDelete = canUseDestructiveActions();
+        const wanted = canDelete
+          ? ["IN", "OUT", "CORRECTION", "DELETE_ITEM"]
+          : ["IN", "OUT", "CORRECTION"];
+
+        const current = Array.from(select.options || []).map((opt) => opt.value);
+        if (current.join("|") !== wanted.join("|")) {
+          select.innerHTML = "";
+          wanted.forEach((value) => {
+            const opt = document.createElement("option");
+            opt.value = value;
+            opt.textContent = value;
+            select.appendChild(opt);
+          });
+        }
+        if (!canDelete && select.value === "DELETE_ITEM") {
+          select.value = "CORRECTION";
+        }
+      }
+
+      function applyMode() {
+        const mode = currentMode();
+        const config = MODES[mode] || MODES.movement;
+        const allFields = [
+          "fieldItemValue", "fieldDeleteItems", "fieldItemId", "fieldItemName", "fieldMovementType", "fieldQuantity", "fieldUnitCost",
+          "fieldPriority", "fieldReason", "fieldOperatorEmail", "fieldRequesterEmail", "fieldCounterEmail", "fieldCategory", "fieldUnit",
+          "fieldMinThreshold", "fieldLotNumber", "fieldExpiryDate", "fieldDocumentRef", "fieldComment"
+        ];
+        allFields.forEach((fieldId) => setFieldVisible(fieldId, config.show.indexOf(fieldId) >= 0));
+
+        const requireIds = config.require.slice();
+        setRequired(
+          ["siteKey", "itemValue", "itemId", "itemName", "movementType", "quantity", "priority", "reason"],
+          ["siteKey"].concat(requireIds)
+        );
+
+        if (!canUseDestructiveActions()) {
+          setFieldVisible("fieldDeleteItems", false);
+        }
+        configureMovementTypeChoices();
+        applySemanticLabels(mode);
+
+        const pharmaMode = MODULE === "pharmacie";
+        if (pharmaMode && (mode === "movement" || mode === "item_create")) {
+          setFieldVisible("fieldLotNumber", true);
+          setFieldVisible("fieldExpiryDate", true);
+        }
+      }
+
+      function loadChoices() {
+        const siteKey = $("siteKey").value;
+        google.script.run
+          .withSuccessHandler((result) => {
+            const itemChoices = (result && result.itemChoices) || [];
+            const replenishmentChoices = (result && result.replenishmentChoices) || [];
+            const deleteChoices = (result && result.deleteChoices) || [];
+            if (currentMode() === "replenishment" && replenishmentChoices.length) {
+              fillSelect("itemValue", replenishmentChoices, true);
+            } else {
+              fillSelect("itemValue", itemChoices, true);
+            }
+            fillSelect("deleteItems", canUseDestructiveActions() ? deleteChoices : [], false);
+            applyAutoItemId(result && result.nextItemId);
+          })
+          .withFailureHandler((error) => {
+            setStatus(String(error && error.message ? error.message : error), false);
+          })
+          .getNativeFormChoices_(FORM_TYPE, MODULE, siteKey);
+      }
+
+      function loadBootstrap() {
+        applyMode();
+        google.script.run
+          .withSuccessHandler((result) => {
+            boot = result || {};
+            if (!boot.mode) {
+              boot.mode = MODE_BY_FORM_TYPE[String(FORM_TYPE || "").trim().toLowerCase()] || "movement";
+            }
+            $("title").textContent = boot.title || "Formulaire natif";
+            $("description").textContent = boot.description || "";
+            $("userLine").textContent = boot.userEmail ? ("Compte: " + boot.userEmail) : "";
+            const sites = (boot.sites || []).map((entry) => entry.siteKey || "");
+            fillSelect("siteKey", sites, false);
+            if (boot.defaultSiteKey) $("siteKey").value = boot.defaultSiteKey;
+            applyMode();
+            applyAutoItemId(boot.nextItemId);
+            loadChoices();
+          })
+          .withFailureHandler((error) => {
+            setStatus(String(error && error.message ? error.message : error), false);
+          })
+          .getNativeFormBootstrap_(FORM_TYPE, MODULE);
+      }
+
+      function collectPayload() {
+        const canDelete = canUseDestructiveActions();
+        const movementType = $("movementType").value;
+        return {
+          siteKey: $("siteKey").value,
+          itemValue: $("itemValue").value,
+          deleteItems: canDelete ? Array.from($("deleteItems").selectedOptions || []).map((opt) => opt.value) : [],
+          itemId: $("itemId").value,
+          itemName: $("itemName").value,
+          movementType: (!canDelete && movementType === "DELETE_ITEM") ? "CORRECTION" : movementType,
+          quantity: $("quantity").value,
+          unitCost: $("unitCost").value,
+          priority: $("priority").value,
+          reason: $("reason").value,
+          operatorEmail: $("operatorEmail").value,
+          requesterEmail: $("requesterEmail").value,
+          counterEmail: $("counterEmail").value,
+          category: $("category").value,
+          unit: $("unit").value,
+          minThreshold: $("minThreshold").value,
+          lotNumber: $("lotNumber").value,
+          expiryDate: $("expiryDate").value,
+          documentRef: $("documentRef").value,
+          comment: $("comment").value
+        };
+      }
+
+      function setSubmitting(isSubmitting) {
+        $("submitBtn").disabled = isSubmitting;
+        $("cancelBtn").disabled = isSubmitting;
+      }
+
+      function submitForm(event) {
+        event.preventDefault();
+        clearStatus();
+        const payload = collectPayload();
+        setSubmitting(true);
+        google.script.run
+          .withSuccessHandler((result) => {
+            setSubmitting(false);
+            setStatus(result && result.message ? result.message : "Soumission enregistree.", true);
+            window.setTimeout(() => google.script.host.close(), 900);
+          })
+          .withFailureHandler((error) => {
+            setSubmitting(false);
+            setStatus(String(error && error.message ? error.message : error), false);
+          })
+          .submitNativeForm_(FORM_TYPE, MODULE, payload);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        $("nativeForm").addEventListener("submit", submitForm);
+        $("cancelBtn").addEventListener("click", () => google.script.host.close());
+        $("siteKey").addEventListener("change", loadChoices);
+        loadBootstrap();
+      });
+    </script>
+  </body>
+</html>

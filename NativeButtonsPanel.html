@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        padding: 12px;
+        font-family: Arial, sans-serif;
+        background: #061a2d;
+        color: #e9f3ff;
+      }
+      h3 {
+        margin: 0 0 10px 0;
+        font-size: 15px;
+      }
+      .group {
+        margin: 10px 0 14px 0;
+        padding: 10px;
+        border: 1px solid #285d8e;
+        border-radius: 8px;
+        background: #0b2741;
+      }
+      .group-title {
+        margin: 0 0 8px 0;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+      button {
+        width: 100%;
+        margin: 4px 0;
+        padding: 9px 10px;
+        border: 1px solid #6ea9d8;
+        border-radius: 6px;
+        background: #1f5f96;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      button:hover { background: #2d76b7; }
+      .hint {
+        margin-top: 8px;
+        font-size: 11px;
+        color: #b9d5f1;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Boutons formulaires</h3>
+
+    <div class="group">
+      <div class="group-title">Incendie</div>
+      <button onclick="run('btnMouvementIncendie')">Mouvement incendie</button>
+      <button onclick="run('btnReapproIncendie')">Demande reappro incendie</button>
+      <button onclick="run('btnCreationArticleIncendie')">Creation article incendie</button>
+    </div>
+
+    <div class="group">
+      <div class="group-title">Pharmacie</div>
+      <button onclick="run('btnMouvementPharmacie')">Mouvement pharmacie</button>
+      <button onclick="run('btnInventairePharmacie')">Inventaire pharmacie</button>
+      <button onclick="run('btnCreationArticlePharmacie')">Creation article pharmacie</button>
+    </div>
+
+    <div class="hint">
+      Si un bouton ne s'ouvre pas, lancer une fois la fonction depuis le menu Operations pour autoriser le script.
+    </div>
+
+    <script>
+      function run(fn) {
+        google.script.run
+          .withFailureHandler(function(err) {
+            alert((err && err.message) || String(err || "Erreur inconnue"));
+          })[fn]();
+      }
+    </script>
+  </body>
+</html>
